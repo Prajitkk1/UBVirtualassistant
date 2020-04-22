@@ -1,0 +1,169 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+
+<body onload="init()";>
+    
+    
+    <h3>going to start taking images in <h3 id="timer"></h3></h3>
+     <p>
+  
+    </p>
+    
+    <div class="container">
+    <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
+        <canvas  id="myCanvas" width="350" height="350"></canvas>  
+      
+        
+        </div>
+  <p>
+      
+      
+      
+
+</body>
+
+<script>
+    
+    
+   var timeleft = 5;
+var downloadTimer = setInterval(function(){
+  if(timeleft <= 0){
+    clearInterval(downloadTimer);
+    document.getElementById("timer").innerHTML = "Finished";
+    
+      snapshot();
+  } else {
+    document.getElementById("timer").innerHTML = timeleft + " seconds remaining";
+  }
+  timeleft -= 1;
+}, 1000);
+    
+    
+    
+    
+      //--------------------
+      // GET USER MEDIA CODE
+      //--------------------
+          navigator.getUserMedia = ( navigator.getUserMedia ||
+                             navigator.webkitGetUserMedia ||
+                             navigator.mozGetUserMedia ||
+                             navigator.msGetUserMedia);
+
+      var video;
+      var webcamStream;
+
+      function startWebcam() {
+        if (navigator.getUserMedia) {
+           navigator.getUserMedia (
+
+              // constraints
+              {
+                 video: true,
+                 audio: false
+              },
+
+              // successCallback
+              function(localMediaStream) {
+                  video = document.querySelector('video');
+                  video.srcObject = localMediaStream
+                 webcamStream = localMediaStream;
+              },
+
+              // errorCallback
+              function(err) {
+                 console.log("The following error occured: " + err);
+              }
+           );
+        } else {
+           console.log("getUserMedia not supported");
+        }  
+      }
+
+      function stopWebcam() {
+          window.location.href = "{{url_for('index')}}"
+          webcamStream.stop();
+          //webcamStream.stop;
+      }
+      //---------------------
+      // TAKE A SNAPSHOT CODE
+      //---------------------
+      var canvas, ctx;
+
+      function init() {
+        // Get the canvas and obtain a context for
+        // drawing in it
+          //startWebcam();
+          startWebcam();
+        canvas = document.getElementById("myCanvas");
+        ctx = canvas.getContext('2d');
+      }
+    var count_add;
+    count_add = 0;
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
+      function snapshot() {
+          
+         // Draws current image from the video element into the canvas
+        ctx.drawImage(video, 0,0, canvas.width, canvas.height)
+         var dataURL = canvas.toDataURL("image/png");
+
+            hehe= dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+          var data1 = { "img_data" : hehe};
+          $.ajax({
+            url: "{{url_for('image_save')}}",
+
+              processData: false,
+              contentType: 'application/json',
+            type: 'POST',
+              data: JSON.stringify(data1),
+            success: function(response) {
+
+                console.log(response);
+                if(response == "success"){
+                    
+                    
+                    //window.location.href = "{{url_for('index')}}"
+                    if(count_add<15){
+                        count_add = count_add +1
+                        wait(1000); 
+                        snapshot();
+                        if(count_add>=15){
+                            window.location.href = "{{url_for('index')}}";
+                        }
+                    }
+                }
+                if(response == "not success"){
+                    if(count_add<15){
+                        //count_add = count_add +1
+                        wait(1000); 
+                        snapshot();
+                        if(count_add>=15){
+                            window.location.href = "{{url_for('index')}}";
+                        }
+                }
+                    
+                    
+                
+                
+                }
+                
+            },
+            error: function(error) {
+                console.log(error);
+            }
+
+        });
+      }
+ //   window.setInterval(function(){
+   //     snapshot();
+// }, 5000);
+
+  </script>
+{%endblock%}
