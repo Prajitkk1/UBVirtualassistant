@@ -95,11 +95,13 @@
             type: 'POST',
               data: JSON.stringify(data1),
             success: function(response) {
-                var responded;
-                responded = response;
                 console.log(response);
-                if(response == "received"){
-                
+                if(response == ""){
+                    cosole.log(response);
+                }else{
+                    console.log("i am able to come here in ocr")
+                    var hello = "http://127.0.0.1:5000/register?name="
+                     window.location.href = hello.concat(response);
                 }
                 
               

@@ -9,6 +9,8 @@ import os
 from virtualassistant import face_detect
 global clf
 import random
+import pytesseract
+
 clf = None
 
 def stringToImage(base64_string):
@@ -54,8 +56,18 @@ def save_new_images(img,name):
     return hmm
 
         
-        
-        
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+def get_string(img):
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    kernel = np.ones((1, 1), np.uint8)
+    img1 = cv2.dilate(img, kernel, iterations=1)
+    img2 = cv2.erode(img1, kernel, iterations=1)
+    result = pytesseract.image_to_string(img2)
+    print("below is the string result")
+    print(result)
+    return result
+
+    
         
         
         

@@ -15,6 +15,7 @@ import base64
 import numpy as np
 import matplotlib.pyplot as plt
 from virtualassistant import helpers
+from virtualassistant.ocr_k import OCR_details
 
 
 @application.route("/home",methods = ['POST', 'GET'])
@@ -26,7 +27,8 @@ def index():
 
 @application.route("/register",methods = ['POST', 'GET'])
 def register():
-    return render_template('register.html')
+    name = request.args.get('name')
+    return render_template('register.html',name = name)
 
 
 @application.route('/_image_recog' , methods = ['POST','GET'])
@@ -34,9 +36,7 @@ def image_recog():
     a = request.get_json().get('img_data')
     hello = helpers.stringToImage(a)
     print("yes it changed")
-    #cv2.imwrite("hehe.png", hello)
     faces = helpers.find_image(hello)
-    #print("no of faces"+ str(len(faces)))
     if len(faces)==1:
         name = helpers.detect_face_given_img(hello)
         flash(" your stupid face is detected")
@@ -51,16 +51,24 @@ def image_recog():
 @application.route('/_ocr_recog' , methods = ['POST','GET'])
 def ocr_recog():
     a = request.get_json().get('img_data')
+    a = helpers.stringToImage(a)
+    names = helpers.get_string(a)
+    names, ph_no, email = OCR_details(a)
+    print("returning names" + str(names))
+    #names = "prajithehe"
+    print(names, ph_no,email)
+    return names
 
-    return "received"
 
 @application.route('/_image_save' , methods = ['POST','GET'])
 def image_save():
     a = request.get_json().get('img_data')
     hello = helpers.stringToImage(a)
     faces = helpers.find_image(hello)
+    name = request.get_json().get('name')
+    print("name i founded"+ str(name))
     if len(faces)==1:
-        helpers.save_new_images(hello, "new_name")
+        helpers.save_new_images(hello, name)
         return "success"
     elif(len(faces)==2):
         return "not success"
@@ -70,7 +78,6 @@ def image_save():
 
 @application.route('/unknown' , methods = ['POST','GET'])
 def unknown():
-    
     return render_template("unknown.html")
 
 
@@ -84,4 +91,11 @@ def ocr_screen():
 def profile():
     name = request.args.get('name')
     return render_template("profile_page.html", name = name)
+
+
+
+@application.route('/audio_try' , methods = ['POST','GET'])
+def audio_try():
+    name = request.args.get('name')
+    return render_template("audio_try.html", name = name)
 

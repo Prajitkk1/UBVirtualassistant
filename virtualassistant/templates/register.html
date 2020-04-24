@@ -10,6 +10,7 @@
      <p>
   
     </p>
+    <h1 id="name">{{name}}</h1>
     
     <div class="container">
     <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
@@ -115,7 +116,10 @@ function wait(ms){
          var dataURL = canvas.toDataURL("image/png");
 
             hehe= dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
-          var data1 = { "img_data" : hehe};
+           console.log("till register create var name i am here")
+          var name = document.getElementById("name").textContent;
+        console.log("till register create var name i am here")
+          var data1 = { "img_data" : hehe, "name":name};
           $.ajax({
             url: "{{url_for('image_save')}}",
 
