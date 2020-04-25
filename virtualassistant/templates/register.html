@@ -11,12 +11,13 @@
   
     </p>
     <h1 id="name">{{name}}</h1>
+    <h1 id="name">{{email_id}}</h1>
+    <h1 id="name">{{mobile_no}}</h1>
     
     <div class="container">
     <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
         <canvas  id="myCanvas" width="350" height="350"></canvas>  
       
-        
         </div>
   <p>
       
@@ -119,7 +120,7 @@ function wait(ms){
            console.log("till register create var name i am here")
           var name = document.getElementById("name").textContent;
         console.log("till register create var name i am here")
-          var data1 = { "img_data" : hehe, "name":name};
+          var data1 = { "img_data" : hehe, "name": name};
           $.ajax({
             url: "{{url_for('image_save')}}",
 

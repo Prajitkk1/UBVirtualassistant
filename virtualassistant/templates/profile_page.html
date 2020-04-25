@@ -2,6 +2,74 @@
 {% block content %}
 
 <h1>{{name}}</h1>
+<script>
+    function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
+    function speech_rec(){
+           var timeleft = 3;
+var downloadTimer = setInterval(function(){
+  if(timeleft <= 0){
 
+        window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    
+        const recognition = new window.SpeechRecognition();
+
+    recognition.onresult = (event) => {
+      const speechToText = event.results[0][0].transcript;
+        console.log(speechToText);
+        if(speechToText == "yes"){
+            console.log("what to do now");
+        }else if(speechToText == "no"){
+            console.log("wrong prediction")
+        }
+        var data1 = { "data" : speechToText};
+        $.ajax({
+            url: "{{url_for('api_message')}}",
+
+              processData: false,
+              contentType: 'application/json',
+            type: 'POST',
+              data: JSON.stringify(data1),
+            success: function(response) {
+                var responded;
+                responded = response;
+                console.log(response);
+                if(response == "received"){
+
+                }
+                
+              
+            },
+            error: function(error) {
+                console.log(error);
+            }
+
+        });
+    }
+    recognition.start();
+          clearInterval(downloadTimer);
+  } 
+  timeleft -= 1;
+}, 1000);
+    
+        
+    };
+    
+    window.onload = function(){
+        var msg = new SpeechSynthesisUtterance('Is my prediction right, please reply with a yes or no');
+      window.speechSynthesis.speak(msg);
+        speech_rec();
+        
+    };
+    
+
+    
+
+</script>
 
 {%endblock%}

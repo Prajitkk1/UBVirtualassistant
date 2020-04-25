@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="container">
+<h1>kindly check if the details are correct</h1>
+</div>
+<div class="container">
+    <h3 id="name1">name: {{name}}</h3>
+        <h3 id="email1">email: {{email}}</h3>
+        <h3 id= "mob_no1">mobile no: {{mobile_no}}</h3>
+
+    
+    <h3 hidden id="name">{{name}}</h3>
+        <h3 hidden id="email">{{email}}</h3>
+        <h3 hidden id= "mob_no">{{mobile_no}}</h3>
+
+    
+</div>
+
+
+<script>
+
+    
+
+    
+    function speech_recognise(){
+        console.log("i am here");
+        window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    
+        const recognition = new window.SpeechRecognition();
+
+            recognition.onresult = (event) => {
+            const speechToText = event.results[0][0].transcript;
+            console.log(speechToText);
+            if(speechToText == "yes"){
+                var name = document.getElementById("name").textContent;
+                var email = document.getElementById("email").textContent;
+                var mob_no = document.getElementById("mob_no").textContent;
+
+                var nme = "http://127.0.0.1:5000/register?name="
+                var nme_con = nme.concat(name)
+                var eml = nme_con.concat("&&email_id=")
+                var eml_con = eml.concat(email)
+                var mob = eml_con.concat("&&mobile_no=")
+                var full = mob.concat(mob_no)
+                //console.log(full)
+                     //console.log(responded);
+                  window.location.href = full
+           // console.log("what to do now");
+            }else if(speechToText == "no"){
+            console.log("wrong ocr")
+            }
+
+            };
+            recognition.start();
+        
+    };
+    
+       var timeleft = 5;
+var downloadTimer = setInterval(function(){
+  if(timeleft <= 0){
+            speech_recognise();
+    clearInterval(downloadTimer);
+    //document.getElementById("timer").innerHTML = "Finished";
+    
+
+  } else {
+   // document.getElementById("timer").innerHTML = timeleft + " seconds remaining";
+  }
+  timeleft -= 1;
+}, 1000);
+
+</script>
+{%endblock%}

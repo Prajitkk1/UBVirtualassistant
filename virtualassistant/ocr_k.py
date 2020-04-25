@@ -10,7 +10,7 @@ import numpy as np
 import pytesseract
 from PIL import Image
 from virtualassistant.business_card_parser import *
-
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
 
 def generate_string(image):
     # Read image with opencv

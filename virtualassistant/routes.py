@@ -2,6 +2,7 @@ from flask import Flask, request,jsonify
 from flask import render_template,url_for,flash, redirect
 from flask import send_from_directory
 from virtualassistant import db
+from virtualassistant.models import User
 from virtualassistant import app as application
 import os
 from PIL import Image
@@ -15,7 +16,11 @@ import base64
 import numpy as np
 import matplotlib.pyplot as plt
 from virtualassistant import helpers
-from virtualassistant.ocr_k import OCR_details
+from virtualassistant.ocr_k import OCR_details,generate_string
+import speech_recognition as sr
+import wave
+import soundfile as sf
+
 
 
 @application.route("/home",methods = ['POST', 'GET'])
@@ -28,7 +33,13 @@ def index():
 @application.route("/register",methods = ['POST', 'GET'])
 def register():
     name = request.args.get('name')
-    return render_template('register.html',name = name)
+    email_id = request.args.get('email_id')
+    ph_no = request.args.get('mobile_no')
+    new_entry = User(name=name,email=email_id,mobile_no=ph_no)
+    db.session.add(new_entry)
+    db.session.commit()
+    flash("you have been registered, please give some pose")
+    return render_template('register.html',name = name,email_id = email_id, phone_no=ph_no)
 
 
 @application.route('/_image_recog' , methods = ['POST','GET'])
@@ -39,11 +50,18 @@ def image_recog():
     faces = helpers.find_image(hello)
     if len(faces)==1:
         name = helpers.detect_face_given_img(hello)
-        flash(" your stupid face is detected")
-        print("name" + str(name))
-        return name
+        if name=="error":
+            return "confused"
+        try_again = helpers.recheck_face(name, hello)
+        if try_again==True:    
+            flash(" your stupid face is detected")
+            print("name" + str(name))
+            return name
+        else:
+            print("try again return false")
+            return "false"
     elif len(faces)==2:
-        flash(" not able to process two images at a time. One by One please")
+        #flash(" not able to process two images at a time. One by One please")
         return "confused"
     return "received"
 
@@ -52,12 +70,13 @@ def image_recog():
 def ocr_recog():
     a = request.get_json().get('img_data')
     a = helpers.stringToImage(a)
-    names = helpers.get_string(a)
+    names = generate_string(a)
     names, ph_no, email = OCR_details(a)
     print("returning names" + str(names))
     #names = "prajithehe"
     print(names, ph_no,email)
-    return names
+    stt = "names=" + str(names) + "&&phone_no="+str(ph_no) + "&&email="+str(email)
+    return stt
 
 
 @application.route('/_image_save' , methods = ['POST','GET'])
@@ -87,6 +106,13 @@ def ocr_screen():
     return render_template("ocr.html")
 
 
+@application.route('/ocr_details' , methods = ['POST','GET'])
+def ocr_details():
+    name = "suraj1"
+    email = "hehe@hehe.com"
+    no = "9586236"
+    return render_template("ocr_checkdetails.html", name = name, email = email, mobile_no = no)
+
 @application.route('/profile' , methods = ['POST','GET'])
 def profile():
     name = request.args.get('name')
@@ -96,6 +122,18 @@ def profile():
 
 @application.route('/audio_try' , methods = ['POST','GET'])
 def audio_try():
-    name = request.args.get('name')
-    return render_template("audio_try.html", name = name)
+    #name = request.args.get('name')
+    return render_template("audio_try.html")
+
+
+@application.route('/_messages', methods = ['POST'])
+def api_message():
+    a = request.get_json().get('data')
+    print(a)
+    return "Binary message written!"
+
+
+@application.route('/wrong_prediction', methods = ['GET','POST'])
+def wrong_prediction():
+    return render_template("wrong_predict.html")
 

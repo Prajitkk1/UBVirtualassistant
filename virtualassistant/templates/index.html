@@ -10,7 +10,7 @@
     <button onclick="stopWebcam();">Stop Assistant</button> 
        <button onclick="snapshot();">Take Snapshot</button> 
     </p>
-    
+    <p id="checking"></p>
     <div class="container">
     <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
         <canvas  id="myCanvas" width="350" height="350"></canvas>  
@@ -121,8 +121,11 @@
                     //$.get("{{url_for('index')}}",callback);
                 }
                 else if(response == "confused"){
-                   flash("one person at a time please")
-                   window.location.href = "{{url_for('index')}}"
+                    document.getElementById("checking").textContent = "confused"
+
+               }else if(response == "false"){
+                   //flash("one person at a time please")
+                   window.location.href = "{{url_for('unknown')}}"
                }else{
                    var hello = "http://127.0.0.1:5000/profile?name="
                      console.log(responded);

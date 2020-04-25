@@ -10,8 +10,12 @@ from virtualassistant import face_detect
 global clf
 import random
 import pytesseract
+import speech_recognition as sr
+from os import listdir
+from os.path import isfile, join
 
 clf = None
+
 
 def stringToImage(base64_string):
     imgdata = base64.b64decode(base64_string)
@@ -19,11 +23,9 @@ def stringToImage(base64_string):
     return cv2.cvtColor(np.array(imgdata), cv2.COLOR_BGR2RGB)
 
 def find_image(img):
-    face_cascade = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')    
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    faces = face_cascade.detectMultiScale(gray, 1.3, 5)
-    print("face detected" + str(len(faces)))
-    return faces
+    face_locations = face_recognition.face_locations(img)
+    #no = len(face_locations)
+    return face_locations
 
 def detect_face_given_img(img):
     global clf
@@ -34,7 +36,6 @@ def detect_face_given_img(img):
     if no>1:
         return "error"
     else:
-        
         test_image_enc = face_recognition.face_encodings(img)[0]
         name = clf.predict([test_image_enc])
         print(*name)
@@ -53,26 +54,26 @@ def save_new_images(img,name):
     except:
         pass
     hmm = cv2.imwrite((path + '\\' + str(rand_no) +".png"), img)
+    print(hmm)
     return hmm
 
-        
-pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
-def get_string(img):
-    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    kernel = np.ones((1, 1), np.uint8)
-    img1 = cv2.dilate(img, kernel, iterations=1)
-    img2 = cv2.erode(img1, kernel, iterations=1)
-    result = pytesseract.image_to_string(img2)
-    print("below is the string result")
-    print(result)
-    return result
 
+def recheck_face(name1,name2):
+    no_trues = []
+    mypath = os.getcwd() + "\\Images\\"+ name1 
+    onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
+    #print(onlyfiles)
+    unknown_face_encoding = face_recognition.face_encodings(name2)[0]
+    for i in range(0,7):
+        picture_of_1 = face_recognition.load_image_file(os.getcwd() + "\\Images\\"+ name1 +"\\" + onlyfiles[i] )
+        my_face_encoding = face_recognition.face_encodings(picture_of_1)[0]
+        results = face_recognition.compare_faces([my_face_encoding], unknown_face_encoding)
+        if results[0] == True:
+            no_trues.append(i)
+    print(len(no_trues))
+    if len(no_trues)>=3:
+        return True
+    else:
+        return False
+        
     
-        
-        
-        
-        
-        
-        
-        
-        

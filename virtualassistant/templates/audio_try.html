@@ -1,12 +1,81 @@
-<title>Simple Recorder.js demo with record, stop and pause</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<div id="controls">
-    <button id="recordButton">Record</button>
-    <button id="pauseButton" disabled>Pause</button>
-    <button id="stopButton" disabled>Stop</button>
-</div>
-<h3>Recordings</h3>
-<ol id="recordingsList"></ol>
-<!-- inserting these scripts at the end to be able to use all the elements in the DOM --> 
-<script src="https://cdn.rawgit.com/mattdiamond/Recorderjs/08e7abd9/dist/recorder.js"></script>
-<script src="js/app.js"></script>
+
+<a id="download">Download</a>
+<p hidden>This paragraph should be hidden.</p>
+<button hidden id="stop" onclick="myFunction()">Stop</button>
+<button id="start" onclick="myFunction()">start</button>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script>
+    function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
+    
+   
+    function myFunction() {
+
+        console.log("function started")
+                wait(3000)
+      var msg = new SpeechSynthesisUtterance('Hello World');
+      window.speechSynthesis.speak(msg);
+}
+     function click(x,y){
+    var ev = document.createEvent("MouseEvent");
+    var el = document.elementFromPoint(x,y);
+    ev.initMouseEvent(
+        "click",
+        true /* bubble */, true /* cancelable */,
+        window, null,
+        x, y, 0, 0, /* coordinates */
+        false, false, false, false, /* modifier keys */
+        0 /*left*/, null
+    );
+    el.dispatchEvent(ev);
+}
+    window.onload = function(){
+        click(100,500);
+        document.elementFromPoint(100, 100).click();
+        wait(3000);
+        var msg = new SpeechSynthesisUtterance('Hello World');
+      window.speechSynthesis.speak(msg);
+     window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    
+        const recognition = new window.SpeechRecognition();
+
+    recognition.onresult = (event) => {
+      const speechToText = event.results[0][0].transcript;
+        console.log(speechToText);
+        var data1 = { "data" : speechToText};
+        $.ajax({
+            url: "{{url_for('api_message')}}",
+
+              processData: false,
+              contentType: 'application/json',
+            type: 'POST',
+              data: JSON.stringify(data1),
+            success: function(response) {
+                var responded;
+                responded = response;
+                console.log(response);
+                if(response == "received"){
+
+                }
+                
+              
+            },
+            error: function(error) {
+                console.log(error);
+            }
+
+        });
+    }
+    recognition.start();
+    
+    
+    };
+  
+    
+
+</script>
