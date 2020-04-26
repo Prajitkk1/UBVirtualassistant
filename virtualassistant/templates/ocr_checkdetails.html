@@ -9,7 +9,7 @@
         <h3 id="email1">email: {{email}}</h3>
         <h3 id= "mob_no1">mobile no: {{mobile_no}}</h3>
 
-    
+    <h3>Please reply in  <h3 id="timer"></h3></h3>
     <h3 hidden id="name">{{name}}</h3>
         <h3 hidden id="email">{{email}}</h3>
         <h3 hidden id= "mob_no">{{mobile_no}}</h3>
@@ -20,18 +20,24 @@
 
 <script>
 
-    
-
-    
+     
     function speech_recognise(){
         console.log("i am here");
         window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
     
         const recognition = new window.SpeechRecognition();
 
+            
             recognition.onresult = (event) => {
             const speechToText = event.results[0][0].transcript;
             console.log(speechToText);
+            if(speechToText == ""){
+                console.log("no input from user");
+                time_setter();
+                recognition.stop();
+                        return (speechToText);
+
+            }
             if(speechToText == "yes"){
                 var name = document.getElementById("name").textContent;
                 var email = document.getElementById("email").textContent;
@@ -52,23 +58,56 @@
             }
 
             };
-            recognition.start();
+            
+    
+ recognition.start(); 
+    
+    
         
     };
     
-       var timeleft = 5;
+
+    window.onload = function(){
+        time_setter();
+        
+    }
+    
+function time_setter(){
+           var timeleft = 5;
 var downloadTimer = setInterval(function(){
   if(timeleft <= 0){
-            speech_recognise();
+         var hello =    speech_recognise();
+      another_time_setter();
+      console.log("return")
+      console.log(hello);
     clearInterval(downloadTimer);
-    //document.getElementById("timer").innerHTML = "Finished";
-    
+    document.getElementById("timer").innerHTML = "speak now";
 
   } else {
-   // document.getElementById("timer").innerHTML = timeleft + " seconds remaining";
+   document.getElementById("timer").innerHTML = timeleft + " seconds";
   }
   timeleft -= 1;
 }, 1000);
+}
+    
+function another_time_setter(){
+               var timeleft = 15;
+var downloadTimer = setInterval(function(){
+  if(timeleft <= 0){
+         var hello =   speech_recognise();
+      console.log("return")
+      console.log(hello);
+    clearInterval(downloadTimer);
+      console.log("second time setter working")
+    document.getElementById("timer").innerHTML = "Please wait while i try to recognise the voise";
+
+  } else {
+   document.getElementById("timer").innerHTML = timeleft + " seconds";
+  }
+  timeleft -= 1;
+}, 1000);
+};
+
 
 </script>
 {%endblock%}

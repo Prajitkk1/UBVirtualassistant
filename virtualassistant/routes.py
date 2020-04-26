@@ -108,10 +108,11 @@ def ocr_screen():
 
 @application.route('/ocr_details' , methods = ['POST','GET'])
 def ocr_details():
-    name = "suraj1"
-    email = "hehe@hehe.com"
-    no = "9586236"
-    return render_template("ocr_checkdetails.html", name = name, email = email, mobile_no = no)
+    name = request.args.get('names')
+    email_id = request.args.get('email')
+    ph_no = request.args.get('phone_no')
+
+    return render_template("ocr_checkdetails.html", name = name, email = email_id, mobile_no = ph_no)
 
 @application.route('/profile' , methods = ['POST','GET'])
 def profile():
@@ -136,4 +137,3 @@ def api_message():
 @application.route('/wrong_prediction', methods = ['GET','POST'])
 def wrong_prediction():
     return render_template("wrong_predict.html")
-
