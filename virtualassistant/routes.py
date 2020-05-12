@@ -5,8 +5,6 @@ from virtualassistant import db
 from virtualassistant.models import User
 from virtualassistant import app as application
 import os
-from PIL import Image
-from sqlalchemy import desc
 import datetime
 from virtualassistant.forms import RegistrationForm
 from virtualassistant.models import User
@@ -17,17 +15,17 @@ import numpy as np
 import matplotlib.pyplot as plt
 from virtualassistant import helpers
 from virtualassistant.ocr_k import OCR_details,generate_string
-import speech_recognition as sr
-import wave
-import soundfile as sf
 
 
 
 @application.route("/home",methods = ['POST', 'GET'])
-@application.route("/",methods = ['POST', 'GET'])
 def index():
-    print(os.listdir())
+    #print(os.listdir())
     return render_template('index.html')
+
+@application.route("/",methods = ['POST', 'GET'])
+def start():
+    return render_template('start.html')
 
 
 @application.route("/register",methods = ['POST', 'GET'])
@@ -39,6 +37,7 @@ def register():
     db.session.add(new_entry)
     db.session.commit()
     flash("you have been registered, please give some pose")
+    helpers.train_new()
     return render_template('register.html',name = name,email_id = email_id, phone_no=ph_no)
 
 
@@ -53,8 +52,7 @@ def image_recog():
         if name=="error":
             return "confused"
         try_again = helpers.recheck_face(name, hello)
-        if try_again==True:    
-            flash(" your stupid face is detected")
+        if try_again==True:
             print("name" + str(name))
             return name
         else:
@@ -73,7 +71,6 @@ def ocr_recog():
     names = generate_string(a)
     names, ph_no, email = OCR_details(a)
     print("returning names" + str(names))
-    #names = "prajithehe"
     print(names, ph_no,email)
     stt = "names=" + str(names) + "&&phone_no="+str(ph_no) + "&&email="+str(email)
     return stt
@@ -117,14 +114,14 @@ def ocr_details():
 @application.route('/profile' , methods = ['POST','GET'])
 def profile():
     name = request.args.get('name')
-    return render_template("profile_page.html", name = name)
+    print(name)
+    data1 = User.query.filter_by(name=str(name)).first()
+    print(data1)
+    email = data1.email
+    mo = data1.mobile_no
+    return render_template("profile_page.html", name = name,email = email,mob = mo)
 
 
-
-@application.route('/audio_try' , methods = ['POST','GET'])
-def audio_try():
-    #name = request.args.get('name')
-    return render_template("audio_try.html")
 
 
 @application.route('/_messages', methods = ['POST'])
@@ -137,3 +134,8 @@ def api_message():
 @application.route('/wrong_prediction', methods = ['GET','POST'])
 def wrong_prediction():
     return render_template("wrong_predict.html")
+
+@application.route('/contact', methods = ['GET','POST'])
+def contact():
+    return render_template("contact.html")
+

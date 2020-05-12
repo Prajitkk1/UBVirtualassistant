@@ -6,11 +6,51 @@
 </div>
 <div class="container">
 <h2>do you like to register</h2>
+    <h3>Please reply in <h3 id="timer"></h3></h3>
     <div class="container">
     <button onclick="window.location.href = 'http://127.0.0.1:5000/ocr';">Yes</button>
     <button onclick="window.location.href = 'https://w3docs.com';">No</button>
         
         </div>
 </div>
+<script>
+    function speech_rec(){
+           var timeleft = 8;
+var downloadTimer = setInterval(function(){
+    document.getElementById("timer").innerHTML = timeleft + " seconds remaining";
+  if(timeleft <= 0){
 
+        window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+    
+        const recognition = new window.SpeechRecognition();
+
+    recognition.onresult = (event) => {
+      const speechToText = event.results[0][0].transcript;
+        console.log(speechToText);
+        if(speechToText == "yes"){
+            window.location.href = "{{url_for('ocr_screen')}}"
+        }else if(speechToText == "no"){
+            console.log("wrong prediction")
+            var msg = new SpeechSynthesisUtterance('Thank you for using virtual assistant');
+      window.speechSynthesis.speak(msg);
+        }
+        var data1 = { "data" : speechToText};
+        
+    }
+    recognition.start();
+          clearInterval(downloadTimer);
+  } 
+  timeleft -= 1;
+}, 1000);
+    
+        
+    };
+     window.onload = function(){
+        var msg = new SpeechSynthesisUtterance('Sorry, I am Not able to predict you, Do you like to register to our system?');
+      window.speechSynthesis.speak(msg);
+        speech_rec();
+        
+    };
+
+</script>
 {%endblock%}

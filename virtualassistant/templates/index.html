@@ -5,22 +5,18 @@
 
 <body onload="init()";>
     
-     <p>
-    <button onclick="startWebcam();">Start Virtual Assistant</button>
-    <button onclick="stopWebcam();">Stop Assistant</button> 
-       <button onclick="snapshot();">Take Snapshot</button> 
-    </p>
+    <h3><h3 id="timer"></h3></h3>
+
     <p id="checking"></p>
-    <div class="container">
-    <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
-        <canvas  id="myCanvas" width="350" height="350"></canvas>  
-      
+    <div class="container col-md-4">
         
+    <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
+       
+      <h3 id="detector">no faces detected</h3>
+         <canvas  id="myCanvas" width="350" height="350"></canvas>  
         </div>
   <p>
-      
-      
-      
+
 
 </body>
 
@@ -39,7 +35,21 @@
          src="{{ url_for('static', filename='tracking.js-master//build//data//mouth.js') }}"></script>
 
 
+
 <script>
+    
+    var timeleft = 5;
+var downloadTimer = setInterval(function(){
+  if(timeleft <= 0){
+    clearInterval(downloadTimer);
+    document.getElementById("timer").innerHTML = "Accessing video";
+//todo add startwebcam in end
+startWebcam()
+  } else {
+    document.getElementById("timer").innerHTML = timeleft + " seconds remaining to start accessing video";
+  }
+  timeleft -= 1;
+}, 1000);
       //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -51,7 +61,7 @@
       var video;
       var webcamStream;
 
-      function startWebcam() {
+    function startWebcam() {
         if (navigator.getUserMedia) {
            navigator.getUserMedia (
 
@@ -75,28 +85,60 @@
            );
         } else {
            console.log("getUserMedia not supported");
-        }  
+        }
+     const trackingTask = tracking.track('#video', tracker);
+        trackingTask.run();
+          tracker.on('track', function(event) {
+              
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+              if(event.data.length != 0){
+                  console.log("face detcted");
+               snapshot();
+                //console.log("hello");
+              document.getElementById("detector").innerHTML = "Face detected wait till it gets processed";
+                  webcamStream.getTracks().forEach(function(track) {
+                      track.stop();
+                    });
+                 // wait(10000);
+                 // console.log(event.data);
+              }
+              
+     
+          //    event.data.forEach(async function(rect) {
+            //    console.log("face detcted");
+            //   await snapshot();
+            //    console.log("hello");
+            //  document.getElementById("detector").innerHTML = "Face detected wait //till it gets processed";
+     //     });
+              
+            
+      });
+  
       }
-
       function stopWebcam() {
           window.location.href = "{{url_for('index')}}"
           webcamStream.stop();
           //webcamStream.stop;
       }
-      //---------------------
-      // TAKE A SNAPSHOT CODE
-      //---------------------
-      var canvas, ctx;
 
+      var canvas, ctx;
+var tracker ;
       function init() {
         // Get the canvas and obtain a context for
         // drawing in it
           //startWebcam();
+          tracker = new tracking.ObjectTracker('face');
+            tracker.setInitialScale(4);
+            tracker.setStepSize(2);
+            tracker.setEdgesDensity(0.1);
+          
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
-      }
+         // startWebcam();
+          
+                     }
 
-      function snapshot() {
+function snapshot() {
           
          // Draws current image from the video element into the canvas
         ctx.drawImage(video, 0,0, canvas.width, canvas.height)
@@ -113,15 +155,18 @@
               data: JSON.stringify(data1),
             success: function(response) {
                 var responded;
+                console.log("working on response");
                 responded = response;
                 console.log(response);
                 if(response == "received"){
-                    
+                    startWebcam();
                     //window.location.href = "{{url_for('index')}}"
                     //$.get("{{url_for('index')}}",callback);
                 }
                 else if(response == "confused"){
-                    document.getElementById("checking").textContent = "confused"
+                    
+                    document.getElementById("checking").textContent = "confused!!          I think 2 are standing"
+                    startWebcam();
 
                }else if(response == "false"){
                    //flash("one person at a time please")
@@ -130,20 +175,27 @@
                    var hello = "http://127.0.0.1:5000/profile?name="
                      console.log(responded);
                    window.location.href = hello.concat(responded);
+                   console.log("redirected");
                 }
               
             },
             error: function(error) {
-                console.log(error);
+                console.log(error); 
+                window.location.href = "{{url_for('index')}}"
+
+                return "errr";
             }
 
         });
+          
       }
- //   window.setInterval(function(){
-   //     snapshot();
-// }, 5000);
+    function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+  }
+}
 
-    //////////////////////////////////try new face detection online//////////////
-   
   </script>
 {%endblock%}

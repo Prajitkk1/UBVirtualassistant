@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<div class="row">
+    <div class="container-fluid col-md-4">
+    <p>click below to start the virtual assistant</p>
+    <p>Please note that it will start using camera automatically in 5 seconds</p>
+</div>
+</div>
+<div class="row">
+<def class="container-fluid col-md-2">
+    
+<input type="button" onclick="location.href='{{url_for('index')}}';" value="Start virtual assistant" />
+</def>
+</div>
+{%endblock%}

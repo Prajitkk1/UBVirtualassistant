@@ -2,6 +2,9 @@
 {% block content %}
 
 <h1>{{name}}</h1>
+<h3>Please reply in <h3 id="timer"></h3></h3>
+
+<h2 id= "displayname"></h2>
 <script>
     function wait(ms){
    var start = new Date().getTime();
@@ -13,44 +16,38 @@
     function speech_rec(){
            var timeleft = 3;
 var downloadTimer = setInterval(function(){
+    document.getElementById("timer").innerHTML = timeleft + " seconds remaining";
   if(timeleft <= 0){
 
         window.SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
     
-        const recognition = new window.SpeechRecognition();
-
-    recognition.onresult = (event) => {
+        const recognition = new webkitSpeechRecognition();
+console.log("speechToText");
+    recognition.onresult = function (event) {
       const speechToText = event.results[0][0].transcript;
+        console.log("here");
         console.log(speechToText);
         if(speechToText == "yes"){
             console.log("what to do now");
+            var msg = new SpeechSynthesisUtterance('Thank you for your reply, welcome to computer science department at university at buffalo, have a nice day');
+            document.getElementById("displayname").innerHTML = "your email id "+{{email}}+" mobile number is "+{{mob}}
+            window.speechSynthesis.speak(msg);
+      var secs = 0;
+            var id = setInterval(function(){ 
+                secs++
+              if(secs>=5){
+                clearInterval(id);
+                window.location.href = "{{url_for('index')}}"
+               }
+            }, 1000);
+      
         }else if(speechToText == "no"){
             console.log("wrong prediction")
+        }else if(speechToText == ""){
+            console.log("no reply")
         }
-        var data1 = { "data" : speechToText};
-        $.ajax({
-            url: "{{url_for('api_message')}}",
 
-              processData: false,
-              contentType: 'application/json',
-            type: 'POST',
-              data: JSON.stringify(data1),
-            success: function(response) {
-                var responded;
-                responded = response;
-                console.log(response);
-                if(response == "received"){
-
-                }
-                
-              
-            },
-            error: function(error) {
-                console.log(error);
-            }
-
-        });
-    }
+    }   
     recognition.start();
           clearInterval(downloadTimer);
   } 
@@ -68,7 +65,6 @@ var downloadTimer = setInterval(function(){
     };
     
 
-    
 
 </script>
 

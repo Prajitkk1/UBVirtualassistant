@@ -7,10 +7,8 @@
 </div>
 <div class="container">
 <h2>Please bring your business card or ID card near the camera</h2>
+    <h4><h4 id="timer"></h4></h4>
     <div class="container">
-       <button onclick="startWebcam();">Start Virtual Assistant</button>
-    <button onclick="stopWebcam();">Stop Assistant</button> 
-       <button onclick="snapshot();">Take Snapshot</button> 
 
          <div class="container">
     <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
@@ -23,6 +21,18 @@
 </body>
 
 <script>
+        var timeleft = 10;
+
+var downloadTimer = setInterval(function(){
+  if(timeleft <= 0){
+    clearInterval(downloadTimer);
+    document.getElementById("timer").innerHTML = "Image captured";
+                snapshot();
+  } else {
+    document.getElementById("timer").innerHTML = "will click an image in "+timeleft + " seconds";
+  }
+  timeleft -= 1;
+}, 1000);
       //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -75,6 +85,7 @@
         // Get the canvas and obtain a context for
         // drawing in it
           //startWebcam();
+          startWebcam() ;
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
       }

@@ -13,7 +13,7 @@
     <h1 id="name">{{name}}</h1>
     <h1 id="name">{{email_id}}</h1>
     <h1 id="name">{{mobile_no}}</h1>
-    
+    <h6 id = needimg></h6>
     <div class="container">
     <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
         <canvas  id="myCanvas" width="350" height="350"></canvas>  
@@ -158,6 +158,7 @@ function wait(ms){
                 
                 
                 }
+                document.getElementById("needimg").innerHTML = "still "+(15-count_add) +" images needed "
                 
             },
             error: function(error) {

@@ -1,0 +1,164 @@
+{% extends "layout.html" %}
+{% block content %}
+
+
+
+<body onload="init()";>
+    
+     <p>
+    <button onclick="startWebcam();">Start Virtual Assistant</button>
+    <button onclick="stopWebcam();">Stop Assistant</button> 
+       <button onclick="snapshot();">Take Snapshot</button> 
+    </p>
+    <p id="checking"></p>
+    <div class="container">
+    <video align="center" onclick="snapshot(this);" width=400 height=400 id="video" controls autoplay ></video>
+        <canvas  id="myCanvas" width="350" height="350"></canvas>  
+      
+        
+        </div>
+  <p>
+      
+      
+      
+
+</body>
+
+
+<script type="text/javascript"
+         src="{{ url_for('static', filename='tracking.js-master//build//tracking.js') }}"></script>
+<script type="text/javascript"
+         src="{{ url_for('static', filename='tracking.js-master//build//tracking-min.js') }}"></script>
+
+<script type="text/javascript"
+         src="{{ url_for('static', filename='tracking.js-master//build//data//face.js') }}"></script>
+<script type="text/javascript"
+         src="{{ url_for('static', filename='tracking.js-master//build//data//eye.js') }}"></script>
+
+<script type="text/javascript"
+         src="{{ url_for('static', filename='tracking.js-master//build//data//mouth.js') }}"></script>
+
+
+
+<script>
+      //--------------------
+      // GET USER MEDIA CODE
+      //--------------------
+          navigator.getUserMedia = ( navigator.getUserMedia ||
+                             navigator.webkitGetUserMedia ||
+                             navigator.mozGetUserMedia ||
+                             navigator.msGetUserMedia);
+
+      var video;
+      var webcamStream;
+
+    function startWebcam() {
+        if (navigator.getUserMedia) {
+           navigator.getUserMedia (
+
+              // constraints
+              {
+                 video: true,
+                 audio: false
+              },
+
+              // successCallback
+              function(localMediaStream) {
+                  video = document.querySelector('video');
+                  video.srcObject = localMediaStream
+                 webcamStream = localMediaStream;
+              },
+
+              // errorCallback
+              function(err) {
+                 console.log("The following error occured: " + err);
+              }
+           );
+        } else {
+           console.log("getUserMedia not supported");
+        }
+        tracking.track('#video', tracker);
+          tracker.on('track', function(event) {
+              
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            event.data.forEach(function(rect) {
+                console.log("face detcted");
+            
+            });
+      });
+  
+      }
+
+      function stopWebcam() {
+          window.location.href = "{{url_for('index')}}"
+          webcamStream.stop();
+          //webcamStream.stop;
+      }
+
+      var canvas, ctx;
+var tracker ;
+      function init() {
+        // Get the canvas and obtain a context for
+        // drawing in it
+          //startWebcam();
+          tracker = new tracking.ObjectTracker('face');
+            tracker.setInitialScale(4);
+            tracker.setStepSize(2);
+            tracker.setEdgesDensity(0.1);
+          
+        canvas = document.getElementById("myCanvas");
+        ctx = canvas.getContext('2d');
+          
+                     }
+
+      function snapshot() {
+          
+         // Draws current image from the video element into the canvas
+        ctx.drawImage(video, 0,0, canvas.width, canvas.height)
+         var dataURL = canvas.toDataURL("image/png");
+
+            hehe= dataURL.replace(/^data:image\/(png|jpg);base64,/, "");
+          var data1 = { "img_data" : hehe};
+          $.ajax({
+            url: "{{url_for('image_recog')}}",
+
+              processData: false,
+              contentType: 'application/json',
+            type: 'POST',
+              data: JSON.stringify(data1),
+            success: function(response) {
+                var responded;
+                responded = response;
+                console.log(response);
+                if(response == "received"){
+                    
+                    //window.location.href = "{{url_for('index')}}"
+                    //$.get("{{url_for('index')}}",callback);
+                }
+                else if(response == "confused"){
+                    document.getElementById("checking").textContent = "confused"
+
+               }else if(response == "false"){
+                   //flash("one person at a time please")
+                   window.location.href = "{{url_for('unknown')}}"
+               }else{
+                   var hello = "http://127.0.0.1:5000/profile?name="
+                     console.log(responded);
+                   window.location.href = hello.concat(responded);
+                }
+              
+            },
+            error: function(error) {
+                console.log(error);
+            }
+
+        });
+      }
+ //   window.setInterval(function(){
+   //     snapshot();
+// }, 5000);
+
+    //////////////////////////////////try new face detection online//////////////
+   
+  </script>
+{%endblock%}

@@ -64,7 +64,7 @@ def recheck_face(name1,name2):
     onlyfiles = [f for f in listdir(mypath) if isfile(join(mypath, f))]
     #print(onlyfiles)
     unknown_face_encoding = face_recognition.face_encodings(name2)[0]
-    for i in range(0,7):
+    for i in range(0,4):
         picture_of_1 = face_recognition.load_image_file(os.getcwd() + "\\Images\\"+ name1 +"\\" + onlyfiles[i] )
         my_face_encoding = face_recognition.face_encodings(picture_of_1)[0]
         results = face_recognition.compare_faces([my_face_encoding], unknown_face_encoding)

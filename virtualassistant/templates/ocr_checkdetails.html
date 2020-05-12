@@ -55,6 +55,9 @@
            // console.log("what to do now");
             }else if(speechToText == "no"){
             console.log("wrong ocr")
+                var msg = new SpeechSynthesisUtterance('sorry that i am unable to capture your information. We will try to add more features. As of now thank you for using virtual assistant. Have a nice day');
+      window.speechSynthesis.speak(msg);
+                window.location.href = "{{url_for('index')}}"
             }
 
             };
@@ -68,8 +71,10 @@
     
 
     window.onload = function(){
-        time_setter();
-        
+   
+        var msg = new SpeechSynthesisUtterance('please check the details');
+      window.speechSynthesis.speak(msg);
+             time_setter();
     }
     
 function time_setter(){
