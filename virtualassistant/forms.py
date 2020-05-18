@@ -11,7 +11,6 @@ class RegistrationForm(FlaskForm):
     email = StringField('EMail',validators=[DataRequired(),Email()])
     name = StringField('Name',validators=[DataRequired()])
     mobile_no = StringField('Mobile number')
-    department = StringField('Department')
     submit = SubmitField('sign up')
 
     def validate_email(self,email):

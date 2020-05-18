@@ -42,7 +42,9 @@ def detect_face_given_img(img):
         return name[0]
         
 def train_new():
+    global clf
     clf = face_detect.train_images()
+    print("training new images")
     
 def save_new_images(img,name):
     rand_no = random.randrange(0,100)

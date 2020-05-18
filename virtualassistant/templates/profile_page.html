@@ -30,18 +30,32 @@ console.log("speechToText");
         if(speechToText == "yes"){
             console.log("what to do now");
             var msg = new SpeechSynthesisUtterance('Thank you for your reply, welcome to computer science department at university at buffalo, have a nice day');
-            document.getElementById("displayname").innerHTML = "your email id "+{{email}}+" mobile number is "+{{mob}}
+           // var eml = String({{email}})
+            var idd = String({{ac_no}})
+            document.getElementById("displayname").innerHTML = "your registered account number is "+ idd
             window.speechSynthesis.speak(msg);
       var secs = 0;
             var id = setInterval(function(){ 
                 secs++
-              if(secs>=5){
+              if(secs>=6){
                 clearInterval(id);
                 window.location.href = "{{url_for('index')}}"
                }
             }, 1000);
       
         }else if(speechToText == "no"){
+            var msg = new SpeechSynthesisUtterance('Sorry, I am not able to predict you, Thank you for your reply, welcome to computer science department at university at buffalo, have a nice day');
+           
+            window.speechSynthesis.speak(msg);
+      var secs = 0;
+            var id = setInterval(function(){ 
+                secs++
+              if(secs>=7){
+                clearInterval(id);
+                window.location.href = "{{url_for('index')}}"
+               }
+            }, 1000);
+            
             console.log("wrong prediction")
         }else if(speechToText == ""){
             console.log("no reply")

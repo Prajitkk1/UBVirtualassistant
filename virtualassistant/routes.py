@@ -14,17 +14,18 @@ import base64
 import numpy as np
 import matplotlib.pyplot as plt
 from virtualassistant import helpers
-from virtualassistant.ocr_k import OCR_details,generate_string
+from virtualassistant.ocr_k import generate_string
+from virtualassistant.b_card import card_details
 
 
 
 @application.route("/home",methods = ['POST', 'GET'])
 def index():
-    #print(os.listdir())
     return render_template('index.html')
 
 @application.route("/",methods = ['POST', 'GET'])
 def start():
+    helpers.train_new()
     return render_template('start.html')
 
 
@@ -37,7 +38,7 @@ def register():
     db.session.add(new_entry)
     db.session.commit()
     flash("you have been registered, please give some pose")
-    helpers.train_new()
+    #
     return render_template('register.html',name = name,email_id = email_id, phone_no=ph_no)
 
 
@@ -69,7 +70,8 @@ def ocr_recog():
     a = request.get_json().get('img_data')
     a = helpers.stringToImage(a)
     names = generate_string(a)
-    names, ph_no, email = OCR_details(a)
+    #names, ph_no, email = OCR_details(a)
+    names, ph_no, email = card_details()
     print("returning names" + str(names))
     print(names, ph_no,email)
     stt = "names=" + str(names) + "&&phone_no="+str(ph_no) + "&&email="+str(email)
@@ -119,7 +121,8 @@ def profile():
     print(data1)
     email = data1.email
     mo = data1.mobile_no
-    return render_template("profile_page.html", name = name,email = email,mob = mo)
+    ac_no = data1.id
+    return render_template("profile_page.html", name = name,mob = mo,ac_no=ac_no)
 
 
 
@@ -139,3 +142,15 @@ def wrong_prediction():
 def contact():
     return render_template("contact.html")
 
+
+@application.route('/admin', methods = ['GET','POST'])
+def admin():
+    form = RegistrationForm()
+    if form.validate_on_submit():
+            user_check = User.query.filter_by(name=form.name.data).first()
+            user = User(name = form.name.data,email = form.email.data,mobile_no = form.mobile_no.data)
+            db.session.add(user)
+            db.session.commit()
+            flash("name registered")
+            return render_template("admin.html",form=form)
+    return render_template("admin.html",form=form)

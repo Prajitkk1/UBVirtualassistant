@@ -37,8 +37,8 @@
 
 
 <script>
-    
-    var timeleft = 5;
+    function startmeter(){
+        var timeleft = 5;
 var downloadTimer = setInterval(function(){
   if(timeleft <= 0){
     clearInterval(downloadTimer);
@@ -50,6 +50,8 @@ startWebcam()
   }
   timeleft -= 1;
 }, 1000);
+    };
+    
       //--------------------
       // GET USER MEDIA CODE
       //--------------------
@@ -134,6 +136,7 @@ var tracker ;
           
         canvas = document.getElementById("myCanvas");
         ctx = canvas.getContext('2d');
+          startmeter();
          // startWebcam();
           
                      }
